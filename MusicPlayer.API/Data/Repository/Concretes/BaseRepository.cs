@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MusicPlayer.API.Data.Repository.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 
 namespace MusicPlayer.API.Data.Repository.Concretes;
@@ -18,6 +20,7 @@ public abstract class BaseRepository<T> : IBaseRepository<T>
     /// Gets or sets the logger.
     /// </summary>
     /// <value>The logger.</value>
+   // protected ILogger Logger { get; set; }
     protected ILogger Logger { get; set; }
 
     public BaseRepository(MusicPlayerContext ctx, ILogger logger)
@@ -76,6 +79,18 @@ public abstract class BaseRepository<T> : IBaseRepository<T>
     /// <param name="entity">The entity.</param>
     public virtual bool Insert(T entity)
     {
+        var ctx = new ValidationContext(entity);
+        var results = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(entity, ctx, results, true))
+        {
+            foreach (var errors in results)
+            {
+                Console.WriteLine("Error {0}", errors);
+                return false;
+            }
+        }
+
         try
         {
             var databaseSet = this.Ctx.Set<T>();
@@ -99,6 +114,17 @@ public abstract class BaseRepository<T> : IBaseRepository<T>
     /// <param name="item">The item.</param>
     public virtual bool Update(T item)
     {
+        var ctx = new ValidationContext(item);
+        var results = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(item, ctx, results, true))
+        {
+            foreach (var errors in results)
+            {
+                Console.WriteLine("Error {0}", errors);
+                return false;
+            }
+        }
         try
         {
             var databaseSet = this.Ctx.Set<T>();
@@ -141,6 +167,17 @@ public abstract class BaseRepository<T> : IBaseRepository<T>
     /// <param name="entityToDelete">The entity to delete.</param>
     public virtual bool Delete(T entityToDelete)
     {
+        var ctx = new ValidationContext(entityToDelete);
+        var results = new List<ValidationResult>();
+
+        if (!Validator.TryValidateObject(entityToDelete, ctx, results, true))
+        {
+            foreach (var errors in results)
+            {
+                Console.WriteLine("Error {0}", errors);
+                return false;
+            }
+        }
         try
         {
             var dbSet = this.Ctx.Set<T>();
@@ -179,26 +216,5 @@ public abstract class BaseRepository<T> : IBaseRepository<T>
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Deletes all entities from table.
-    /// </summary>
-    /// <param name="entity">The entity.</param>
-    public bool DeleteAllEntitiesFromTable()
-    {
-        try
-        {
-            var dbSet = this.Ctx.Set<T>();
-            dbSet.RemoveRange(dbSet);
-            this.Ctx.SaveChanges();
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogError(ex.Message + ex.InnerException + "The DeleteAllEntitiesFromTable could not been made.");
-            return false;
-        }
-
-        return true;
     }
 }

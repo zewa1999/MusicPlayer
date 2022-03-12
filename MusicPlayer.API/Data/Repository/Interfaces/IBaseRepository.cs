@@ -29,12 +29,6 @@ public interface IBaseRepository<T>
     bool Delete(T entity);
 
     /// <summary>
-    /// Deletes all entities from table.
-    /// </summary>
-    /// <param name="tableName">Name of the table.</param>
-    bool DeleteAllEntitiesFromTable();
-
-    /// <summary>
     /// Gets the by identifier.
     /// </summary>
     /// <param name="id"> The identifier. </param>

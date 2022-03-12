@@ -11,15 +11,33 @@ namespace MusicPlayer.API
         private ILogger _logger;
         private ISongRepository songRepository;
 
-        public SongController(ILogger logger, ISongRepository songRepo)
+        public SongController(ISongRepository songRepo, ILogger logger)
         {
             _logger = logger;
             songRepository = songRepo;
         }
 
-        [HttpGet]
+        [HttpGet("/all")]
         public IActionResult GetAllSongs()
         {
+            //var artists = new List<Artist>
+            //{ new Artist
+            //{
+            //    Name ="Marius de la Focsani"
+            //}
+            //};
+
+            //var song = new Song
+            //{
+            //    Name = "Patru puncte cardinale",
+            //    Duration = "03:59",
+            //    Artists = artists,
+            //    Content = Song.GetFileAsBytes(@"C:\Users\costa\Desktop\MusicPlayer\Patru puncte cardinale.mp3"),
+            //    Image = Song.GetFileAsBytes(@"C:\Users\costa\Desktop\MusicPlayer\maxresdefault.jpg")
+            //};
+            //songRepository.Insert(song);
+            //return Ok();
+
             var listOfSongs = new List<Song>();
             try
             {
@@ -27,15 +45,15 @@ namespace MusicPlayer.API
             }
             catch (Exception ex)
             {
-                _logger.LogError("Something has gone wrong.. ooops. {0}", ex.Message);
+                // _logger.LogError("Something has gone wrong.. ooops. {0}", ex.Message);
                 // checked to see if it is this case.. if not, change it
                 return BadRequest();
             }
-
+            System.IO.File.WriteAllBytes(@"D:\demo\mariusica.mp3", listOfSongs.FirstOrDefault().Content);
             return Ok(listOfSongs);
         }
 
-        [HttpGet(@"songs")]
+        [HttpGet("/{songName}")]
         public IActionResult GetSongsByName(string songName)
         {
             var listOfSongs = new List<Song>();
@@ -45,7 +63,7 @@ namespace MusicPlayer.API
             }
             catch (Exception ex)
             {
-                _logger.LogError("Something has gone wrong.. ooops. {0}", ex.Message);
+                //  _logger.LogError("Something has gone wrong.. ooops. {0}", ex.Message);
                 // checked to see if it is this case.. if not, change it
                 return BadRequest();
             }

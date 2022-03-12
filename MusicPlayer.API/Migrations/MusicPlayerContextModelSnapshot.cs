@@ -15,22 +15,7 @@ namespace MusicPlayer.API.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.1");
-
-            modelBuilder.Entity("ArtistSong", b =>
-                {
-                    b.Property<int>("ArtistsId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CreatedSongsId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("ArtistsId", "CreatedSongsId");
-
-                    b.HasIndex("CreatedSongsId");
-
-                    b.ToTable("ArtistSong");
-                });
+            modelBuilder.HasAnnotation("ProductVersion", "6.0.3");
 
             modelBuilder.Entity("MusicPlayer.API.Models.Account", b =>
                 {
@@ -39,14 +24,16 @@ namespace MusicPlayer.API.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Password")
-                        .HasMaxLength(30)
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Username")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
@@ -62,12 +49,18 @@ namespace MusicPlayer.API.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("SongId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Artist");
+                    b.HasIndex("SongId");
+
+                    b.ToTable("Artists");
                 });
 
             modelBuilder.Entity("MusicPlayer.API.Models.Song", b =>
@@ -106,18 +99,21 @@ namespace MusicPlayer.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("AccountId")
+                    b.Property<int>("AccountId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
+                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
@@ -128,19 +124,11 @@ namespace MusicPlayer.API.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ArtistSong", b =>
+            modelBuilder.Entity("MusicPlayer.API.Models.Artist", b =>
                 {
-                    b.HasOne("MusicPlayer.API.Models.Artist", null)
-                        .WithMany()
-                        .HasForeignKey("ArtistsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MusicPlayer.API.Models.Song", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedSongsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Artists")
+                        .HasForeignKey("SongId");
                 });
 
             modelBuilder.Entity("MusicPlayer.API.Models.Song", b =>
@@ -154,9 +142,16 @@ namespace MusicPlayer.API.Migrations
                 {
                     b.HasOne("MusicPlayer.API.Models.Account", "Account")
                         .WithMany()
-                        .HasForeignKey("AccountId");
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Account");
+                });
+
+            modelBuilder.Entity("MusicPlayer.API.Models.Song", b =>
+                {
+                    b.Navigation("Artists");
                 });
 
             modelBuilder.Entity("MusicPlayer.API.Models.User", b =>
